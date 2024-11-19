@@ -59,6 +59,9 @@ func initialHandler(conn net.Conn) {
 
 	buf := make([]byte, 32)
 	l, err := conn.Read(buf)
+	fmt.Printf("[DEBUG] err: %d, l: %d, buf[0]: %x, buf[1]: %x, buf[2]: %x\n", err, l, buf[0], buf[1], buf[2])
+	fmt.Printf("[DEBUG] Full buffer: %x\n", buf[:l])
+
 	if err != nil || l <= 0 {
 		return
 	}
@@ -79,14 +82,14 @@ func initialHandler(conn net.Conn) {
 				}
 				source = string(source_buf)
 			}
-			fmt.Println("NEW ADMIN WITH SOURCE")
+			fmt.Println("[+] New Bot with source connected")
 			NewBot(conn, buf[3], source).Handle()
 		} else {
-			fmt.Println("NEW ADMIN NO SOURCE")
+			fmt.Println("[!] New bot no source connected")
 			NewBot(conn, buf[3], "").Handle()
 		}
 	} else {
-		fmt.Println("NEW ADMIN")
+		fmt.Println("[+] New Admin Connected")
 		NewAdmin(conn).Handle()
 	}
 }

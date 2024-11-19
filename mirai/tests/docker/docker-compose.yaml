@@ -19,7 +19,7 @@ services:
     # privileged: true
     networks:
       botnet: {}
-      # servernet: {}
+      servernet: {}
     # entrypoint: tail -f /dev/null
     depends_on:
       - cnc

