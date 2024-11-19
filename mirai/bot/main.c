@@ -287,6 +287,7 @@ int main(int argc, char **args)
                 {
                     uint8_t id_len = util_strlen(id_buf);
 
+                    printf("addrs: %s\n", args[2]);
                     LOCAL_ADDR = util_local_addr(args[2]);
                     send(fd_serv, "\x00\x00\x00\x01", 4, MSG_NOSIGNAL);
                     send(fd_serv, &id_len, sizeof (id_len), MSG_NOSIGNAL);

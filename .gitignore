@@ -38,3 +38,5 @@ go.work.sum
 .env
 
 mirai/cnc/cnc
+
+netshoot

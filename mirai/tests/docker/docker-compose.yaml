@@ -1,0 +1,53 @@
+services:
+  cnc:
+    image: 'test-cnc'
+    # image: 'secsi/mirai-cnc:0.0.1'
+    container_name: cnc
+    # privileged: true
+    ports: 
+      - 11123:23
+    stdin_open: true
+    tty: true
+    networks:
+      botnet:
+        ipv4_address: 172.20.0.2
+  bot_n:
+    # image: 'secsi/mirai-bot:0.0.1'
+    image: 'test-bot'
+    stdin_open: true
+    tty: true
+    # privileged: true
+    networks:
+      botnet: {}
+      # servernet: {}
+    # entrypoint: tail -f /dev/null
+    depends_on:
+      - cnc
+      - victim_server
+  victim_server:
+    image: 'httpd:latest'
+    container_name: victim_server
+    stdin_open: true
+    tty: true
+    # ports:
+    #   - '1111:80'
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"          # Limita l'uso della CPU a 50% di un core
+          memory: "512M"       # Limita l'uso della memoria a 512 MB
+        reservations:
+          cpus: "0.25"         # Riserva il 25% di un core per il container
+          memory: "256M"       # Riserva 256 MB di memoria
+    networks:
+      servernet:
+        ipv4_address: 172.19.0.2
+networks:
+  botnet:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+  servernet:
+    ipam:
+      config:
+        - subnet: 172.19.0.0/24
