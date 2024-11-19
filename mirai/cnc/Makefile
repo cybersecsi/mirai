@@ -2,7 +2,7 @@ VERSION=$(shell cat VERSION.txt)
 IMAGE_NAME=secsi/mirai-cnc
 
 docker-build:
-	docker build -t secsi/mirai:$(VERSION) .
+	docker build -t $(IMAGE_NAME):$(VERSION) .
 
 
 docker-push:
