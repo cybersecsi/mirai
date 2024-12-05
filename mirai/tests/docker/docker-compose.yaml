@@ -1,11 +1,10 @@
 services:
   cnc:
-    # image: 'test-cnc'
-    image: 'secsi/mirai-cnc:0.0.1'
-    # container_name: cnc
+    image: 'secsi/mirai-cnc:0.0.2'
+    container_name: cnc
     # privileged: true
     ports: 
-      - 11123:23
+      - 23:23
     stdin_open: true
     tty: true
     networks:
@@ -13,10 +12,11 @@ services:
         ipv4_address: 172.20.0.2
   bot_n:
     image: 'secsi/mirai-bot:0.0.1'
-    # image: 'test-bot'
     stdin_open: true
     tty: true
     # privileged: true
+    deploy:
+      replicas: 5
     networks:
       botnet: {}
       servernet: {}

